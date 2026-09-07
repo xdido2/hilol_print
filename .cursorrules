@@ -1,0 +1,356 @@
+# Flutter Clean Architecture — Cursor Rules
+
+This project uses Flutter with Clean Architecture, BLoC/Cubit, and feature-first organization. Follow these rules without exception when generating or completing code.
+
+## Project Structure
+
+```
+lib/
+  main.dart
+  src/
+    common/                    # shared, non-core helpers (extensions, generic widgets)
+      extensions/
+      widget/
+    core/                      # cross-cutting infrastructure
+      app/
+      auth/                    # session notifier, auth state singleton
+      di/injection.dart        # get_it: shared services + invokes each feature's di/ module
+      error/                   # shared failures, error mappers
+      localization/
+      network/                 # dio, interceptors
+      router/routes.dart       # go_router config
+      shared/                  # shared feature-like modules (settings, etc.)
+      theme/
+      widget/                  # design system widgets
+    features/
+      <feature>/
+        data/
+          datasources/
+            local/             # hive, shared_preferences wrappers
+            remote/            # retrofit clients
+          models/              # JSON DTOs with toEntity()
+          repository/          # <feature>_repository_impl.dart
+        domain/
+          entities/            # pure Dart objects
+          error/               # typed exceptions
+          repository/          # abstract interfaces
+          usecase/             # one file per use case
+        presentation/
+          bloc/                # or cubit/
+          screen/
+          state/               # State<T> mixins for screens
+          widget/              # feature-local widgets
+        di/                    # GetIt registration for this feature only (called from core/di)
+```
+
+## File Placement Rules
+
+When the user asks for something, place it as follows. Never put a file in the wrong layer.
+
+| Artifact                          | Path                                                                          |
+| --------------------------------- | ----------------------------------------------------------------------------- |
+| New feature                       | `lib/src/features/<feature>/`                                                 |
+| Entity (pure Dart)                | `features/<feature>/domain/entities/<name>_entity.dart`                       |
+| Repository interface              | `features/<feature>/domain/repository/<feature>_repository.dart`              |
+| UseCase                           | `features/<feature>/domain/usecase/<verb>_<noun>_use_case.dart`               |
+| Domain exception                  | `features/<feature>/domain/error/<feature>_exceptions.dart`                   |
+| DTO model                         | `features/<feature>/data/models/<name>_model.dart`                            |
+| Repository implementation         | `features/<feature>/data/repository/<feature>_repository_impl.dart`           |
+| Remote data source                | `features/<feature>/data/datasources/remote/<feature>_remote_data_source.dart`|
+| Local data source                 | `features/<feature>/data/datasources/local/<feature>_local_data_source.dart`  |
+| Cubit                             | `features/<feature>/presentation/cubit/<feature>_cubit.dart`                  |
+| Cubit state                       | `features/<feature>/presentation/cubit/<feature>_cubit_state.dart`            |
+| Screen                            | `features/<feature>/presentation/screen/<name>_screen.dart`                   |
+| Screen state mixin                | `features/<feature>/presentation/state/<name>_state.dart`                     |
+| Feature-local widget              | `features/<feature>/presentation/widget/<name>_widget.dart`                   |
+| Feature DI module                 | `features/<feature>/di/<feature>_injection.dart` (registers only that feature) |
+| Design-system widget              | `core/widget/<category>/<name>.dart`                                          |
+| Test                              | `test/features/<feature>/<layer>/<name>_test.dart`                            |
+
+## Naming
+
+- Files: `snake_case.dart`. Class suffix must match file suffix (`_cubit.dart` → `class XCubit`).
+- Classes: `PascalCase`. Methods/variables: `lowerCamelCase`. Constants: `lowerCamelCase`, `k`-prefix only for file-local hardcoded values.
+- Enums: cases are `lowerCamelCase`.
+- Private: leading underscore. Use it aggressively for non-exposed members.
+
+## Imports
+
+Generate imports in this order, each group separated by one blank line:
+1. `dart:*`
+2. `package:flutter/*`
+3. Third-party `package:*`
+4. Workspace `package:<workspace_pkg>/*`
+5. Relative `../`, `./`
+
+Alphabetize within each group. Inside `lib/src/`, use relative imports. Across workspace packages (`packages/...`), use `package:` imports.
+
+## State Management
+
+- Default to `Cubit`. Use `Bloc` only when event transformers are needed.
+- One state class per cubit, modeled as:
+
+```dart
+@immutable
+final class XCubitState {
+  const XCubitState({
+    this.status = Status.initial,
+    this.action = XAction.none,
+    this.data,
+    this.errorMessage,
+  });
+
+  final Status status;
+  final XAction action;
+  final DataType? data;
+  final String? errorMessage;
+
+  XCubitState copyWith({Status? status, XAction? action, DataType? data, String? errorMessage}) =>
+      XCubitState(
+        status: status ?? this.status,
+        action: action ?? this.action,
+        data: data ?? this.data,
+        errorMessage: errorMessage,
+      );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is XCubitState &&
+          status == other.status &&
+          action == other.action &&
+          data == other.data &&
+          errorMessage == other.errorMessage;
+
+  @override
+  int get hashCode => Object.hash(status, action, data, errorMessage);
+}
+```
+
+- Always use the shared `Status` enum (`initial, loading, success, error`) from `common/data/enums/`.
+- Cubit method template:
+
+```dart
+Future<void> doSomething(...) async {
+  if (state.status.isLoading) return;
+  emit(state.copyWith(status: .loading, action: .someAction, errorMessage: null));
+  try {
+    final result = await _someUseCase(...);
+    emit(state.copyWith(status: .success, action: .someAction, data: result));
+  } on KnownDomainException catch (e) {
+    emit(state.copyWith(status: .error, action: .someAction, errorMessage: e.toString()));
+  } catch (e) {
+    emit(state.copyWith(status: .error, action: .someAction, errorMessage: e.toString()));
+  }
+}
+```
+
+- Cubits never depend on repositories directly. Inject UseCases.
+- Cubits never import `flutter/material.dart` or `BuildContext`.
+
+## UseCase Template
+
+Always single `call()` method:
+
+```dart
+final class DoSomethingUseCase {
+  const DoSomethingUseCase({required SomeRepository repository}) : _repository = repository;
+  final SomeRepository _repository;
+
+  Future<ResultEntity> call({required ParamType param}) => _repository.doSomething(param);
+}
+```
+
+Do not put logic in a UseCase that the repository should own. UseCases orchestrate; repositories execute.
+
+## Repository Template
+
+```dart
+// domain/repository/x_repository.dart
+abstract interface class XRepository {
+  Future<XEntity> fetch();
+  Future<void> save(XEntity entity);
+}
+
+// data/repository/x_repository_impl.dart
+final class XRepositoryImpl implements XRepository {
+  const XRepositoryImpl({required XRemoteDataSource remote, required XLocalDataSource local})
+    : _remote = remote, _local = local;
+
+  final XRemoteDataSource _remote;
+  final XLocalDataSource _local;
+
+  @override
+  Future<XEntity> fetch() async {
+    final XModel model = await _remote.fetch();
+    await _local.cache(model);
+    return model.toEntity();
+  }
+
+  @override
+  Future<void> save(XEntity entity) => _remote.save(XModel.fromEntity(entity));
+}
+```
+
+## Model Template (freezed required for multi-field models)
+
+```dart
+@freezed
+class XModel with _$XModel {
+  const factory XModel({
+    required String id,
+    required String name,
+    @Default(false) bool isActive,
+  }) = _XModel;
+
+  factory XModel.fromJson(Map<String, dynamic> json) => _$XModelFromJson(json);
+
+  const XModel._();
+
+  XEntity toEntity() => XEntity(id: id, name: name, isActive: isActive);
+}
+```
+
+Rules:
+- Models with ≥2 fields → freezed + json_serializable.
+- Single-field DTOs may be hand-written.
+- Every model exposes `toEntity()`. Models never leak past the data layer.
+- Run `dart run build_runner build --delete-conflicting-outputs` after changing freezed/json classes.
+
+## Entity Template
+
+Pure Dart, immutable, no Flutter imports:
+
+```dart
+final class XEntity {
+  const XEntity({required this.id, required this.name});
+
+  final String id;
+  final String name;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is XEntity && id == other.id && name == other.name;
+
+  @override
+  int get hashCode => Object.hash(id, name);
+}
+```
+
+For complex entities, prefer freezed in domain (still pure-Dart compatible).
+
+## Screen Template
+
+```dart
+class XScreen extends StatefulWidget {
+  const XScreen({super.key});
+
+  @override
+  State<XScreen> createState() => _XScreenState();
+}
+
+class _XScreenState extends XScreenState {
+  @override
+  Widget build(BuildContext context) => BlocConsumer<XCubit, XCubitState>(
+    listenWhen: (previous, current) => previous.status != current.status,
+    listener: (context, state) {
+      if (state.status.isError) context.showErrorSnackBar(state.errorMessage ?? 'Error');
+    },
+    builder: (context, state) => Scaffold(
+      appBar: AppBar(title: const Text('X')),
+      body: _Body(state: state),
+    ),
+  );
+}
+```
+
+Move imperative state, controllers, focus nodes, and form validation into the `state/` mixin (`abstract class XScreenState extends State<XScreen>`).
+
+## Dependency Injection
+
+- **Per feature:** each feature owns its registrations in `features/<feature>/di/<feature>_injection.dart` (or equivalent), e.g. `void registerFeatureDependencies(GetIt sl) { ... }` containing only that feature’s data sources, repositories, use cases, and cubits.
+- **Core composition:** `core/di/injection.dart` registers app-wide/shared services, then calls each feature’s registrar (in a documented order). Do not put feature B’s `register*` logic inside feature A’s module.
+
+Example feature module:
+
+```dart
+void registerXDependencies(GetIt sl) {
+  sl.registerLazySingleton<XRemoteDataSource>(() => XRemoteDataSourceImpl(dio: sl()));
+  sl.registerLazySingleton<XRepository>(() => XRepositoryImpl(remote: sl(), local: sl()));
+  sl.registerLazySingleton<DoSomethingUseCase>(() => DoSomethingUseCase(repository: sl()));
+  sl.registerFactory<XCubit>(() => XCubit(doSomethingUseCase: sl()));
+}
+```
+
+Rules:
+- Repositories, data sources, use cases → `registerLazySingleton`.
+- Cubits → `registerFactory` (new instance per provider).
+- When `injectable` is used, prefer `@injectable` / `@LazySingleton()` annotations and run `build_runner`.
+
+## Navigation
+
+- Routes are declared in `core/router/routes.dart` inside `sealed class AppRouter`.
+- Route paths are `static const String` fields on `AppRouter`.
+- Use `ShellRoute` to share blocs across grouped routes (auth shell, main shell).
+- Use `context.go(AppRouter.x)` for replacement, `context.push(AppRouter.x)` for stack.
+- Reactive redirect via `refreshListenable: sl<AuthSessionNotifier>()`.
+
+## Error Handling
+
+- Domain exceptions in `features/<feature>/domain/error/<feature>_exceptions.dart`.
+- Data layer translates infrastructure errors (DioException, HiveError) → domain exceptions. Never propagate `DioException` past the data layer.
+- Cubits catch and emit `errorMessage`. UI displays it. No try/catch in widgets.
+
+## Linting & Formatting
+
+- `flutter analyze` must be clean before commit. Treat info-level warnings as errors when they appear in code you touched.
+- 120-column line length (matches `analysis_options.yaml`).
+- Single quotes for strings.
+- Trailing commas on multi-line collections, parameter lists, and constructor arguments — they drive the auto-formatter.
+- Use `const` constructors everywhere possible.
+- Use enum shorthand syntax (`.loading` instead of `Status.loading`) when the type is inferred (this project has `prefer_shorthands` enabled).
+- No `print()` in committed code. Use a logger.
+- No `// TODO` or `// FIXME` without a tracking issue link or an owner prefix (`// TODO(name):`, `// FIXME(name):`).
+
+## Comments
+
+- Default: no comments. Names should explain.
+- Add a comment only when the *why* is non-obvious: a hidden invariant, a workaround for a known bug, a constraint from an external system.
+- When work is incomplete or intentionally wrong, leave `// TODO` (deferred/missing work) or `// FIXME` (known defect or temporary hack) at that line, with the same owner-or-issue rule as in Linting.
+- No "what" comments. No restating the code in prose.
+- No multi-paragraph docstrings on internal classes.
+
+## Generated Files
+
+Never hand-edit:
+- `*.g.dart`
+- `*.freezed.dart`
+- `*.gen.dart`
+- `lib/src/core/localization/generated/`
+- `lib/src/core/constant/gen/`
+
+Regenerate via:
+- `dart run build_runner build --delete-conflicting-outputs` for freezed/json/injectable/retrofit.
+- `flutter gen-l10n` for localization.
+- `dart run flutter_gen` for assets.
+
+## When Completing Code
+
+- If asked to "add a feature X", scaffold the full `data/domain/presentation` tree plus `di/` with feature-local GetIt registration, wire that module from `core/di/injection.dart`, add a route, and stub a screen. Do not create just the screen.
+- If asked to "fetch data from API", create remote data source + retrofit interface + model + repository impl + use case + cubit method. Don't shortcut by calling Dio from a cubit.
+- If asked for a "form", put `TextEditingController`s in a `state/` mixin, not directly in the screen.
+- If asked to "save locally", create a local data source. Cubits never touch `SharedPreferences` or `Hive` directly.
+
+## Anti-patterns (auto-reject)
+
+- `setState` in a screen that has a Cubit.
+- Repository called directly from a Cubit.
+- Model imported in `presentation/`.
+- `Navigator.of(context).push(...)` instead of `go_router`.
+- Catching `Exception` or `Object` broadly to silence errors.
+- `dynamic` in public APIs.
+- `late` without a clear lifecycle reason (prefer nullable or constructor injection).
+- Business logic in widgets.
+- New singleton via `static` instead of registering in `get_it`.
+- Hardcoded user-facing strings in projects that have l10n configured.

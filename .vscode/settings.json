@@ -1,0 +1,23 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.rulers": [
+      120
+    ]
+  },
+  "dart.lineLength": 120,
+  "editor.guides.bracketPairs": "active",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.matchBrackets": "always",
+  "editor.selectionHighlight": true,
+  "editor.guides.highlightActiveIndentation": true,
+  "cSpell.words": [
+    "usecase"
+  ],
+  "dart.flutterSdkPath": ".fvm/versions/3.41.6"
+}

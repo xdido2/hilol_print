@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+
+import '../../../app/extension/context_extension.dart';
+
+class CustomButton extends StatelessWidget {
+  const CustomButton({
+    super.key,
+    required this.title,
+    required this.onTap,
+    this.borderRadius = const BorderRadius.all(.circular(999)),
+    this.padding = const .symmetric(horizontal: 20.0, vertical: 14.0),
+  }) : outlined = false;
+
+  const CustomButton.outlined({
+    super.key,
+    required this.title,
+    required this.onTap,
+    this.borderRadius = const BorderRadius.all(.circular(999)),
+    this.padding = const .symmetric(horizontal: 20.0, vertical: 14.0),
+  }) : outlined = true;
+
+  final String title;
+  final VoidCallback onTap;
+  final bool outlined;
+  final BorderRadius borderRadius;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    child: SizedBox(
+      width: .infinity,
+      child: Material(
+        color: outlined ? context.color.transparent : context.color.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius,
+          side: outlined ? BorderSide(color: context.color.grey950) : BorderSide.none,
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: borderRadius,
+          overlayColor: WidgetStateProperty.resolveWith((states) {
+            if (!states.contains(WidgetState.pressed)) {
+              return null;
+            }
+            return context.color.grey950.withValues(alpha: outlined ? .04 : .06);
+          }),
+          child: Padding(
+            padding: padding,
+            child: Center(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: .ellipsis,
+                style: context.textTheme.sfProDisplayW500S16.copyWith(
+                  color: outlined ? context.color.grey950 : context.color.black,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}

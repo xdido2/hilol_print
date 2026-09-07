@@ -1,0 +1,19 @@
+name: local_source
+description: "A new Flutter package project."
+version: 0.0.1
+
+resolution: workspace
+
+environment:
+  sdk: ^3.10.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  encrypt: ^5.0.3
+  shared_preferences: ^2.5.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

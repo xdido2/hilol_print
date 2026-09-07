@@ -1,0 +1,27 @@
+include: package:flutter_lints/flutter.yaml
+
+plugins:
+  prefer_shorthands: ^0.4.7
+
+prefer_shorthands:
+  convert_implicit_declaration: true
+
+formatter:
+  page_width: 120
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "lib/src/core/localization/generated/**"
+    - "lib/src/core/constant/gen/**"
+    - "packages/**"
+    - "package/**"
+
+linter:
+  rules:
+    avoid_print: true
+    prefer_single_quotes: false
+    prefer_const_constructors: true
+    prefer_relative_imports: true
+    prefer_expression_function_bodies: true

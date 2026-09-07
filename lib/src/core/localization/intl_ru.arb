@@ -1,0 +1,149 @@
+{
+  "@@locale": "ru",
+
+  "loginLanguageSheetTitle": "Выберите язык",
+  "loginLanguageSheetSelectButton": "Выбрать",
+  "loginLanguageRussian": "Русский",
+  "loginLanguageUzbek": "O‘zbekcha",
+  "loginLanguageEnglish": "English",
+
+  "loginPhoneNotFoundError": "Номер телефона не найден",
+  "loginRegistrationTitle": "Вход",
+  "loginRegistrationSubtitle": "Введите номер телефона, чтобы продолжить",
+  "loginPhoneLabel": "Номер телефона",
+  "loginPhoneHint": "99 123 45 67",
+  "loginPhonePrefix": "+998",
+  "loginContinueButton": "Продолжить",
+
+  "loginAgreementPrefix": "Продолжая, вы соглашаетесь с ",
+  "loginAgreementTerms": "Условиями использования",
+  "loginAgreementMiddle": " и ",
+  "loginAgreementPrivacyPolicy": "Политикой конфиденциальности",
+  "loginAgreementSuffix": ".",
+
+  "otpGenericError": "Что-то пошло не так. Попробуйте снова.",
+  "otpSmsResent": "SMS-код отправлен повторно",
+  "otpTitle": "Подтверждение",
+  "otpSubtitle": "Введите код, отправленный на {phone}",
+  "@otpSubtitle": {
+    "placeholders": {
+      "phone": {}
+    }
+  },
+  "otpResendSms": "Отправить снова",
+  "otpResendSmsIn": "Отправить снова через {time}",
+  "@otpResendSmsIn": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "otpConfirmButton": "Подтвердить",
+
+  "homeTitle": "Главная",
+  "homeMyClassesSectionTitle": "Мои классы",
+  "homeTodayLessonsSectionTitle": "Уроки сегодня",
+  "homeAllButton": "Все",
+  "homeLoadError": "Ошибка загрузки",
+  "homeRetryButton": "Повторить",
+  "homeNotifications": "Уведомления",
+  "homeAllClasses": "Все классы",
+  "homeAllLessons": "Все уроки",
+  "homeLessonStatusCompleted": "Завершен",
+  "homeLessonStatusNow": "Сейчас",
+  "homeLessonStatusUpcoming": "Скоро",
+
+  "commonLoading": "Загрузка",
+  "commonError": "Ошибка",
+  "commonLoadError": "Ошибка загрузки",
+  "commonRetry": "Повторить",
+
+  "commonPageNotFound": "Страница не найдена: {error}",
+  "@commonPageNotFound": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "commonInvalidOtpRequest": "Неверный запрос OTP",
+
+  "comingSoonWithTitle": "{title} (скоро)",
+  "@comingSoonWithTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+
+  "mainNavHome": "Главная",
+  "mainNavJournal": "Журнал",
+  "mainNavChats": "Чаты",
+  "mainNavProfile": "Профиль",
+
+  "journalTitle": "Журнал",
+  "chatTitle": "Чаты",
+  "profileTitle": "Профиль",
+  "profileMenuSettings": "Настройки",
+  "profileMenuTerms": "Правила использования",
+  "profileMenuSupport": "Поддержка",
+  "profileSupportTelegram": "Написать через Telegram",
+  "profileMenuLogout": "Выход",
+  "profileLogoutConfirmTitle": "Вы точно хотите выйти с аккаунта?",
+
+  "profilePersonalDataTitle": "Личные данные",
+  "profilePersonalDataIdLabel": "ID",
+  "profilePersonalDataDobLabel": "Дата рождения",
+  "profilePersonalDataGenderLabel": "Пол",
+  "profilePersonalDataPhoneLabel": "Телефон номер для связи",
+  "profilePersonalDataAddressLabel": "Адрес",
+  "profilePersonalDataPassportLabel": "Серия и номер паспорта",
+
+  "profileAvatarSheetTitle": "Аватар",
+  "profileAvatarSheetGallery": "Загрузить из галереи",
+  "profileAvatarSheetCamera": "Сделать снимок",
+  "profileAvatarSheetSetPhoto": "Установить фото",
+  "profileAvatarSheetDeletePhoto": "Удалить фото"
+  ,
+  "settingsLanguageTitle": "Язык",
+  "commonNo": "Нет",
+  "commonYes": "Да",
+
+  "cardAddTitle": "Добавить карту",
+  "cardNumberLabel": "Номер карты",
+  "cardNumberHint": "0000 0000 0000 0000",
+  "cardNumberError": "Введите все 16 цифр карты",
+  "cardExpiryLabel": "Срок действия",
+  "cardExpiryHint": "MM/YY",
+  "cardExpiryError": "Введите корректный срок действия",
+  "cardPreviewValidThru": "VALID THRU",
+  "cardScanButton": "Сканировать",
+  "cardNfcButton": "NFC",
+  "cardSaveButton": "Добавить карту",
+  "commonOr": "или",
+  "cardScannerTitle": "Сканирование карты",
+  "cardScannerHint": "Поместите карту в рамку",
+  "cardScannerRecognizedHint": "Карта распознана",
+  "cardScannerManualInput": "Ввести вручную",
+  "cardScannerUseResult": "Использовать данные",
+  "cardScannerPermissionTitle": "Нужен доступ к камере",
+  "cardScannerPermissionSubtitle": "Разрешите доступ к камере, чтобы отсканировать данные карты.",
+  "cardScannerPermissionSettingsHint": "Доступ к камере отключён. Включите его в настройках системы, чтобы сканировать карту.",
+  "cardScannerPermissionAllow": "Разрешить доступ",
+  "cardScannerPermissionOpenSettings": "Открыть настройки",
+  "cardNfcDialogTitle": "Приложите карту",
+  "cardNfcDialogSubtitle": "Держите карту у задней панели телефона до конца считывания",
+  "cardNfcDialogSuccessTitle": "Карта считана",
+  "cardNfcDialogSuccessSubtitle": "Данные карты подставлены в форму",
+  "cardNfcDialogErrorTitle": "Не удалось считать карту",
+  "cardNfcDialogErrorSubtitle": "Уберите карту и попробуйте ещё раз",
+  "cardNfcDialogRetry": "Повторить",
+  "cardNfcDialogCancel": "Отмена",
+  "cardNfcDialogClose": "Закрыть",
+
+  "cardAddSuccess": "Карта добавлена",
+  "cardDuplicateError": "Эта карта уже добавлена",
+
+  "cardAddError": "Не удалось добавить карту. Попробуйте снова.",
+
+  "cardsSectionTitle": "Мои карты",
+  "cardsEmptyTitle": "Карт пока нет",
+  "cardsEmptySubtitle": "Добавьте первую карту — она появится здесь.",
+  "cardsLoadError": "Не удалось загрузить сохранённые карты."
+}

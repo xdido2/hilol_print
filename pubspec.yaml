@@ -1,0 +1,121 @@
+name: hilol_print
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+3
+
+environment: 
+  sdk: '>=3.10.0<4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_localizations:
+    sdk: flutter
+
+  intl: any
+
+  # Local packages
+  local_source:
+    path: package/local_source
+
+
+  # UI
+  cupertino_icons: ^1.0.9
+  shimmer: ^3.0.0
+  flutter_svg: ^2.2.4
+  pinput: ^6.0.2
+
+  # Network
+  thunder: ^0.2.5
+  cached_network_image: ^3.4.1
+  dio: ^5.9.2
+  dio_retry_plus: ^2.0.8
+
+  # State managment
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.8
+  bloc: ^9.2.0
+
+  # Permissions
+  permission_handler: ^12.0.1
+
+  # Media
+  image_picker: ^1.1.2
+  camera: ^0.12.0+2
+  google_mlkit_text_recognition: ^0.16.0
+
+  # Navigation
+  go_router: ^17.1.0
+  go_provider: ^2.0.1
+
+  # DI
+  get_it: ^9.2.1
+
+  meta: ^1.17.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  shared_preferences: ^2.5.3
+  # Code generation
+  build_runner: ^2.13.1
+  intl_utils: ^2.8.14
+  flutter_gen_runner: ^5.13.0
+  # dart run flutter_launcher_icons -f flutter_launcher_icons.yaml
+  flutter_launcher_icons: ^0.14.4
+  # dart run flutter_native_splash:create --path=flutter_native_splash.yaml
+  flutter_native_splash: ^2.4.7
+  vector_graphics_compiler: ^1.2.0
+
+  # Lints
+  flutter_lints: ^6.0.0
+  prefer_shorthands: ^0.4.7
+  mocktail: ^1.0.5
+  bloc_test: ^10.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/vectors/
+    - config/
+
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter/Inter-VariableFont.ttf
+        - asset: assets/fonts/Inter/Inter-Italic-VariableFont.ttf
+          style: italic
+
+    - family: SF Pro Display
+      fonts:
+        - asset: assets/fonts/sf/SF-Pro-Display-Regular.otf
+        - asset: assets/fonts/sf/SF-Pro-Display-Medium.otf
+        - asset: assets/fonts/sf/SF-Pro-Display-Semibold.otf
+        - asset: assets/fonts/sf/SF-Pro-Display-Bold.otf
+        - asset: assets/fonts/sf/SF-Pro-Display-Heavy.otf
+        - asset: assets/fonts/sf/SF-Pro-Display-Black.otf
+
+flutter_intl:
+  enabled: true
+  class_name: GeneratedLocalization
+  main_locale: ru
+  arb_dir: lib/src/core/localization
+  output_dir: lib/src/core/localization/generated
+  use_deferred_loading: false
+  line_length: 120
+
+flutter_gen:
+  output: lib/src/core/constant/gen
+  line_length: 120
+
+  integrations:
+    flutter_svg: true
+
+workspace:
+  - package/local_source

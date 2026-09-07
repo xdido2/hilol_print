@@ -1,0 +1,149 @@
+{
+  "@@locale": "uz",
+
+  "loginLanguageSheetTitle": "Tilni tanlang",
+  "loginLanguageSheetSelectButton": "Tanlash",
+  "loginLanguageRussian": "Русский",
+  "loginLanguageUzbek": "O‘zbekcha",
+  "loginLanguageEnglish": "English",
+
+  "loginPhoneNotFoundError": "Telefon raqami topilmadi",
+  "loginRegistrationTitle": "Kirish",
+  "loginRegistrationSubtitle": "Davom etish uchun telefon raqamingizni kiriting",
+  "loginPhoneLabel": "Telefon raqami",
+  "loginPhoneHint": "99 123 45 67",
+  "loginPhonePrefix": "+998",
+  "loginContinueButton": "Davom etish",
+
+  "loginAgreementPrefix": "Davom etish orqali siz ",
+  "loginAgreementTerms": "Foydalanish shartlari",
+  "loginAgreementMiddle": " va ",
+  "loginAgreementPrivacyPolicy": "Maxfiylik siyosati",
+  "loginAgreementSuffix": " bilan tanishganingizni tasdiqlaysiz.",
+
+  "otpGenericError": "Nimadir xato ketdi. Qayta urinib ko‘ring.",
+  "otpSmsResent": "SMS-kod qayta yuborildi",
+  "otpTitle": "Tasdiqlash",
+  "otpSubtitle": "{phone} raqamiga yuborilgan kodni kiriting",
+  "@otpSubtitle": {
+    "placeholders": {
+      "phone": {}
+    }
+  },
+  "otpResendSms": "SMSni qayta yuborish",
+  "otpResendSmsIn": "{time} dan so‘ng qayta yuborish",
+  "@otpResendSmsIn": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "otpConfirmButton": "Tasdiqlash",
+
+  "homeTitle": "Bosh sahifa",
+  "homeMyClassesSectionTitle": "Mening sinflarim",
+  "homeTodayLessonsSectionTitle": "Bugungi darslar",
+  "homeAllButton": "Barchasi",
+  "homeLoadError": "Yuklashda xatolik",
+  "homeRetryButton": "Qayta urinish",
+  "homeNotifications": "Bildirishnomalar",
+  "homeAllClasses": "Barcha sinflar",
+  "homeAllLessons": "Barcha darslar",
+  "homeLessonStatusCompleted": "Yakunlangan",
+  "homeLessonStatusNow": "Hozir",
+  "homeLessonStatusUpcoming": "Tez orada",
+
+  "commonLoading": "Yuklanmoqda",
+  "commonError": "Xatolik",
+  "commonLoadError": "Yuklashda xatolik",
+  "commonRetry": "Qayta urinish",
+
+  "commonPageNotFound": "Sahifa topilmadi: {error}",
+  "@commonPageNotFound": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "commonInvalidOtpRequest": "OTP so‘rovi noto‘g‘ri",
+
+  "comingSoonWithTitle": "{title} (tez orada)",
+  "@comingSoonWithTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+
+  "mainNavHome": "Bosh sahifa",
+  "mainNavJournal": "Jurnal",
+  "mainNavChats": "Chatlar",
+  "mainNavProfile": "Profil",
+
+  "journalTitle": "Jurnal",
+  "chatTitle": "Chatlar",
+  "profileTitle": "Profil",
+  "profileMenuSettings": "Sozlamalar",
+  "profileMenuTerms": "Foydalanish qoidalari",
+  "profileMenuSupport": "Yordam",
+  "profileSupportTelegram": "Telegram orqali yozish",
+  "profileMenuLogout": "Chiqish",
+  "profileLogoutConfirmTitle": "Hisobdan chiqmoqchimisiz?",
+
+  "profilePersonalDataTitle": "Shaxsiy ma'lumotlar",
+  "profilePersonalDataIdLabel": "ID",
+  "profilePersonalDataDobLabel": "Tug'ilgan sana",
+  "profilePersonalDataGenderLabel": "Jinsi",
+  "profilePersonalDataPhoneLabel": "Bog'lanish telefoni",
+  "profilePersonalDataAddressLabel": "Manzil",
+  "profilePersonalDataPassportLabel": "Pasport seriya va raqami",
+
+  "profileAvatarSheetTitle": "Avatar",
+  "profileAvatarSheetGallery": "Galereyadan yuklash",
+  "profileAvatarSheetCamera": "Rasmga olish",
+  "profileAvatarSheetSetPhoto": "Rasmni o'rnatish",
+  "profileAvatarSheetDeletePhoto": "Rasmni o‘chirish"
+  ,
+  "settingsLanguageTitle": "Til",
+  "commonNo": "Yo‘q",
+  "commonYes": "Ha",
+
+  "cardAddTitle": "Karta qo‘shish",
+  "cardNumberLabel": "Karta raqami",
+  "cardNumberHint": "0000 0000 0000 0000",
+  "cardNumberError": "Karta raqamining 16 ta raqamini kiriting",
+  "cardExpiryLabel": "Amal qilish muddati",
+  "cardExpiryHint": "MM/YY",
+  "cardExpiryError": "To‘g‘ri amal qilish muddatini kiriting",
+  "cardPreviewValidThru": "VALID THRU",
+  "cardScanButton": "Skanerlash",
+  "cardNfcButton": "NFC",
+  "cardSaveButton": "Karta qo‘shish",
+  "commonOr": "yoki",
+  "cardScannerTitle": "Kartani skanerlash",
+  "cardScannerHint": "Kartani ramka ichiga joylashtiring",
+  "cardScannerRecognizedHint": "Karta aniqlandi",
+  "cardScannerManualInput": "Qo‘lda kiritish",
+  "cardScannerUseResult": "Ma’lumotlardan foydalanish",
+  "cardScannerPermissionTitle": "Kameraga ruxsat kerak",
+  "cardScannerPermissionSubtitle": "Karta ma’lumotlarini skanerlash uchun kameraga ruxsat bering.",
+  "cardScannerPermissionSettingsHint": "Kameraga ruxsat o‘chirilgan. Kartani skanerlash uchun uni tizim sozlamalarida yoqing.",
+  "cardScannerPermissionAllow": "Ruxsat berish",
+  "cardScannerPermissionOpenSettings": "Sozlamalarni ochish",
+  "cardNfcDialogTitle": "Kartani yaqinlashtiring",
+  "cardNfcDialogSubtitle": "Ma’lumotlar o‘qib bo‘lguncha kartani telefonning orqa qismida ushlab turing",
+  "cardNfcDialogSuccessTitle": "Karta o‘qildi",
+  "cardNfcDialogSuccessSubtitle": "Karta ma’lumotlari formaga joylashtirildi",
+  "cardNfcDialogErrorTitle": "Kartani o‘qib bo‘lmadi",
+  "cardNfcDialogErrorSubtitle": "Kartani olib, qaytadan urinib ko‘ring",
+  "cardNfcDialogRetry": "Qayta urinish",
+  "cardNfcDialogCancel": "Bekor qilish",
+  "cardNfcDialogClose": "Yopish",
+
+  "cardAddSuccess": "Karta qo‘shildi",
+  "cardDuplicateError": "Bu karta allaqachon qo‘shilgan",
+
+  "cardAddError": "Kartani qo‘shib bo‘lmadi. Qayta urinib ko‘ring.",
+
+  "cardsSectionTitle": "Mening kartalarim",
+  "cardsEmptyTitle": "Hozircha kartalar yo‘q",
+  "cardsEmptySubtitle": "Birinchi kartangizni qo‘shing — u shu yerda ko‘rinadi.",
+  "cardsLoadError": "Saqlangan kartalarni yuklab bo‘lmadi."
+}

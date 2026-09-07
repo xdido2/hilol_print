@@ -1,0 +1,6 @@
+{
+  "ENVIRONMENT": "development",
+  "API_BASE_URL": "https://api.example.com",
+  "ENVIRONMENT_ID" :"",
+  "PROJECT_ID" :""
+}

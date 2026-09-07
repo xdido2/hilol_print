@@ -1,0 +1,149 @@
+{
+  "@@locale": "en",
+
+  "loginLanguageSheetTitle": "Choose language",
+  "loginLanguageSheetSelectButton": "Select",
+  "loginLanguageRussian": "Русский",
+  "loginLanguageUzbek": "O‘zbekcha",
+  "loginLanguageEnglish": "English",
+
+  "loginPhoneNotFoundError": "Phone number not found",
+  "loginRegistrationTitle": "Sign in",
+  "loginRegistrationSubtitle": "Enter your phone number to continue",
+  "loginPhoneLabel": "Phone number",
+  "loginPhoneHint": "99 123 45 67",
+  "loginPhonePrefix": "+998",
+  "loginContinueButton": "Continue",
+
+  "loginAgreementPrefix": "By continuing, you agree to the ",
+  "loginAgreementTerms": "Terms of Service",
+  "loginAgreementMiddle": " and ",
+  "loginAgreementPrivacyPolicy": "Privacy Policy",
+  "loginAgreementSuffix": ".",
+
+  "otpGenericError": "Something went wrong. Try again.",
+  "otpSmsResent": "SMS code resent",
+  "otpTitle": "Verification",
+  "otpSubtitle": "Enter the code sent to {phone}",
+  "@otpSubtitle": {
+    "placeholders": {
+      "phone": {}
+    }
+  },
+  "otpResendSms": "Resend SMS",
+  "otpResendSmsIn": "Resend in {time}",
+  "@otpResendSmsIn": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "otpConfirmButton": "Confirm",
+
+  "homeTitle": "Home",
+  "homeMyClassesSectionTitle": "My classes",
+  "homeTodayLessonsSectionTitle": "Lessons today",
+  "homeAllButton": "All",
+  "homeLoadError": "Failed to load",
+  "homeRetryButton": "Retry",
+  "homeNotifications": "Notifications",
+  "homeAllClasses": "All classes",
+  "homeAllLessons": "All lessons",
+  "homeLessonStatusCompleted": "Completed",
+  "homeLessonStatusNow": "Now",
+  "homeLessonStatusUpcoming": "Upcoming",
+
+  "commonLoading": "Loading",
+  "commonError": "Error",
+  "commonLoadError": "Failed to load",
+  "commonRetry": "Retry",
+
+  "commonPageNotFound": "Page not found: {error}",
+  "@commonPageNotFound": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "commonInvalidOtpRequest": "Invalid OTP request",
+
+  "comingSoonWithTitle": "{title} (coming soon)",
+  "@comingSoonWithTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+
+  "mainNavHome": "Home",
+  "mainNavJournal": "Journal",
+  "mainNavChats": "Chats",
+  "mainNavProfile": "Profile",
+
+  "journalTitle": "Journal",
+  "chatTitle": "Chats",
+  "profileTitle": "Profile",
+  "profileMenuSettings": "Settings",
+  "profileMenuTerms": "Terms of use",
+  "profileMenuSupport": "Support",
+  "profileSupportTelegram": "Write via Telegram",
+  "profileMenuLogout": "Logout",
+  "profileLogoutConfirmTitle": "Are you sure you want to log out?",
+
+  "profilePersonalDataTitle": "Personal data",
+  "profilePersonalDataIdLabel": "ID",
+  "profilePersonalDataDobLabel": "Date of birth",
+  "profilePersonalDataGenderLabel": "Gender",
+  "profilePersonalDataPhoneLabel": "Contact phone number",
+  "profilePersonalDataAddressLabel": "Address",
+  "profilePersonalDataPassportLabel": "Passport series and number",
+
+  "profileAvatarSheetTitle": "Avatar",
+  "profileAvatarSheetGallery": "Upload from gallery",
+  "profileAvatarSheetCamera": "Take a photo",
+  "profileAvatarSheetSetPhoto": "Set photo",
+  "profileAvatarSheetDeletePhoto": "Delete photo"
+  ,
+  "settingsLanguageTitle": "Language",
+  "commonNo": "No",
+  "commonYes": "Yes",
+
+  "cardAddTitle": "Add card",
+  "cardNumberLabel": "Card number",
+  "cardNumberHint": "0000 0000 0000 0000",
+  "cardNumberError": "Enter all 16 digits of the card",
+  "cardExpiryLabel": "Expiry date",
+  "cardExpiryHint": "MM/YY",
+  "cardExpiryError": "Enter a valid expiry date",
+  "cardPreviewValidThru": "VALID THRU",
+  "cardScanButton": "Scan",
+  "cardNfcButton": "NFC",
+  "cardSaveButton": "Add card",
+  "commonOr": "or",
+  "cardScannerTitle": "Card scanning",
+  "cardScannerHint": "Place the card inside the frame",
+  "cardScannerRecognizedHint": "Card recognized",
+  "cardScannerManualInput": "Enter manually",
+  "cardScannerUseResult": "Use data",
+  "cardScannerPermissionTitle": "Camera access needed",
+  "cardScannerPermissionSubtitle": "Allow camera access to scan the card details.",
+  "cardScannerPermissionSettingsHint": "Camera access is turned off. Enable it in the system settings to scan the card.",
+  "cardScannerPermissionAllow": "Allow access",
+  "cardScannerPermissionOpenSettings": "Open settings",
+  "cardNfcDialogTitle": "Tap your card",
+  "cardNfcDialogSubtitle": "Hold the card against the back of the phone until reading is finished",
+  "cardNfcDialogSuccessTitle": "Card read",
+  "cardNfcDialogSuccessSubtitle": "The card details are filled in the form",
+  "cardNfcDialogErrorTitle": "Could not read the card",
+  "cardNfcDialogErrorSubtitle": "Move the card away and try again",
+  "cardNfcDialogRetry": "Try again",
+  "cardNfcDialogCancel": "Cancel",
+  "cardNfcDialogClose": "Close",
+
+  "cardAddSuccess": "Card added",
+  "cardDuplicateError": "This card has already been added",
+
+  "cardAddError": "Could not add the card. Try again.",
+
+  "cardsSectionTitle": "My cards",
+  "cardsEmptyTitle": "No cards yet",
+  "cardsEmptySubtitle": "Add your first card and it will show up here.",
+  "cardsLoadError": "Could not load the saved cards."
+}

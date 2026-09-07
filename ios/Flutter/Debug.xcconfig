@@ -1,0 +1,11 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
+#include "Generated.xcconfig"
+
+// Signing defaults used by CI and by anyone on the shared Apple Developer team.
+// Referenced from Runner.xcodeproj as $(DEV_TEAM) / $(BUNDLE_ID_SUFFIX).
+DEV_TEAM = 38GTVL46PX
+BUNDLE_ID_SUFFIX =
+
+// Per-machine overrides (git-ignored). See LocalSigning.xcconfig.example.
+// Must stay last: the final assignment wins in an xcconfig.
+#include? "LocalSigning.xcconfig"

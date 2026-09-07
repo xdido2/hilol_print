@@ -1,0 +1,22 @@
+import 'package:flutter/material.dart';
+
+import '../../../app/extension/context_extension.dart';
+
+class CustomIconButton extends StatefulWidget {
+  const CustomIconButton({super.key, required this.icon, this.onTap});
+  final Widget icon;
+  final VoidCallback? onTap;
+
+  @override
+  State<CustomIconButton> createState() => _CustomIconButtonState();
+}
+
+class _CustomIconButtonState extends State<CustomIconButton> {
+  @override
+  Widget build(BuildContext context) => IconButton(
+    onPressed: widget.onTap,
+    padding: const .all(4),
+    style: IconButton.styleFrom(backgroundColor: context.color.white, fixedSize: const .square(44)),
+    icon: widget.icon,
+  );
+}

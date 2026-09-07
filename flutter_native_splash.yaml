@@ -1,0 +1,12 @@
+# Native splash screen (make generate-splash)
+# Rasm: PNG, 4x pixel density uchun mo‘ljallangan.
+flutter_native_splash:
+  color: "#00563B"
+  image: "assets/images/splash.png"
+  fullscreen: true
+
+  # Android 12+
+  android_12:
+    color: "#00563B"
+    image: "assets/images/splash.png"
+    icon_background_color: "#00563B"

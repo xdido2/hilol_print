@@ -1,0 +1,22 @@
+// Local iOS signing overrides — copy to LocalSigning.xcconfig and edit.
+//
+//     cp ios/Flutter/LocalSigning.xcconfig.example ios/Flutter/LocalSigning.xcconfig
+//
+// LocalSigning.xcconfig is git-ignored, so these values never reach the repo
+// and CI keeps building with the defaults from Debug/Release.xcconfig.
+//
+// DEV_TEAM: your Apple Developer Team ID. A free Apple ID gets a "Personal
+// Team" that can sign builds for your own devices — Xcode > Settings >
+// Accounts > Manage Certificates shows it, or read it off an installed
+// certificate:
+//
+//     security find-certificate -c "Apple Development" -p \
+//       | openssl x509 -noout -subject       # the OU=... field is the team id
+//
+// BUNDLE_ID_SUFFIX: keeps your build from colliding with the App ID that is
+// already registered to the shared team. A Personal Team cannot create a
+// profile for uz.xdido.hilolPrint, but it can for uz.xdido.hilolPrint.dev.
+// The suffix must start with a dot.
+
+DEV_TEAM = XXXXXXXXXX
+BUNDLE_ID_SUFFIX = .dev
