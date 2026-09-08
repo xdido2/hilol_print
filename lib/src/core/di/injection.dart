@@ -36,6 +36,14 @@ import '../../features/profile/data/repository/profile_repository_impl.dart';
 import '../../features/profile/domain/repository/profile_repository.dart';
 import '../../features/profile/domain/usecase/get_profile_use_case.dart';
 import '../../features/profile/presentation/cubit/profile_cubit.dart';
+import '../../features/card/data/datasources/local/card_nfc_data_source.dart';
+import '../../features/card/data/repository/card_nfc_repository_impl.dart';
+import '../../features/card/domain/repository/card_nfc_repository.dart';
+import '../../features/card/domain/usecase/dispose_nfc_reader_use_case.dart';
+import '../../features/card/domain/usecase/observe_nfc_read_use_case.dart';
+import '../../features/card/domain/usecase/start_nfc_session_use_case.dart';
+import '../../features/card/domain/usecase/stop_nfc_session_use_case.dart';
+import '../../features/card/presentation/cubit/card_nfc_cubit.dart';
 import '../auth/auth_session_notifier.dart';
 import '../constant/config.dart';
 import '../shared/settings/data/repository/settings_repository_impl.dart';
@@ -122,6 +130,29 @@ Future<void> _initCard() async {
       recognizeCardUseCase: sl<RecognizeCardUseCase>(),
       openAppSettingsUseCase: sl<OpenAppSettingsUseCase>(),
       disposeCardScannerUseCase: sl<DisposeCardScannerUseCase>(),
+    ),
+  );
+
+  sl.registerLazySingleton<CardNfcDataSource>(CardNfcDataSourceImpl.new);
+  sl.registerLazySingleton<CardNfcRepository>(() => CardNfcRepositoryImpl(dataSource: sl<CardNfcDataSource>()));
+  sl.registerLazySingleton<ObserveNfcReadUseCase>(
+    () => ObserveNfcReadUseCase(cardNfcRepository: sl<CardNfcRepository>()),
+  );
+  sl.registerLazySingleton<StartNfcSessionUseCase>(
+    () => StartNfcSessionUseCase(cardNfcRepository: sl<CardNfcRepository>()),
+  );
+  sl.registerLazySingleton<StopNfcSessionUseCase>(
+    () => StopNfcSessionUseCase(cardNfcRepository: sl<CardNfcRepository>()),
+  );
+  sl.registerLazySingleton<DisposeNfcReaderUseCase>(
+    () => DisposeNfcReaderUseCase(cardNfcRepository: sl<CardNfcRepository>()),
+  );
+  sl.registerFactory<CardNfcCubit>(
+    () => CardNfcCubit(
+      observeNfcReadUseCase: sl<ObserveNfcReadUseCase>(),
+      startNfcSessionUseCase: sl<StartNfcSessionUseCase>(),
+      stopNfcSessionUseCase: sl<StopNfcSessionUseCase>(),
+      disposeNfcReaderUseCase: sl<DisposeNfcReaderUseCase>(),
     ),
   );
 }

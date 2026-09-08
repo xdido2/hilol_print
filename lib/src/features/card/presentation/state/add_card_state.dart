@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,7 +8,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../common/extensions/extensions.dart';
 import '../../../../core/router/routes.dart';
 import '../../domain/entity/card_entity.dart';
+import '../../domain/entity/nfc_card_entity.dart';
 import '../cubit/card_cubit.dart';
+import '../cubit/card_nfc_cubit.dart';
 import '../formatter/card_expiry_input_formatter.dart';
 import '../formatter/card_number_input_formatter.dart';
 import '../screen/add_card_screen.dart';
@@ -75,10 +79,21 @@ abstract class AddCardState extends State<AddCardScreen> {
     _applyFormatted(expiryController, const CardExpiryInputFormatter(), result.expiry);
   }
 
+  /// Opens the NFC session and the dialog together: the session is started
+  /// before the dialog so the very first `scanning` event is not missed, and
+  /// stopped after it closes whichever way the user left.
   Future<void> onNfcTap() async {
     context.hideKeyboard();
-    // TODO(NFC): drive the dialog from the NFC cubit — wrap it in a BlocBuilder and fill the fields on success.
-    await NfcReadDialogWidget.show(context);
+
+    final CardNfcCubit cubit = context.read<CardNfcCubit>();
+    unawaited(cubit.start());
+
+    final NfcCardEntity? card = await NfcReadDialogWidget.show(context, cubit: cubit);
+    await cubit.stop();
+    if (card == null || !mounted) return;
+
+    _applyFormatted(cardNumberController, const CardNumberInputFormatter(), card.panNumber);
+    _applyFormatted(expiryController, const CardExpiryInputFormatter(), card.expiry);
   }
 
   void onSaveTap() {

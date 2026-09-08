@@ -17,6 +17,7 @@ import '../../features/journal/presentation/screen/journal_screen.dart';
 import '../../features/main/presentation/screen/main_screen.dart';
 import '../../features/profile/presentation/cubit/profile_cubit.dart';
 import '../../features/profile/presentation/screen/profile_screen.dart';
+import '../../features/card/presentation/cubit/card_nfc_cubit.dart';
 import '../auth/auth_session_notifier.dart';
 import '../di/injection.dart';
 
@@ -89,7 +90,13 @@ sealed class AppRouter {
     path: addCard,
     name: addCard,
     parentNavigatorKey: rootNavigatorKey,
-    builder: (_, _) => BlocProvider(create: (_) => sl<CardCubit>(), child: const AddCardScreen()),
+    builder: (_, _) => MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => sl<CardCubit>()),
+        BlocProvider(create: (_) => sl<CardNfcCubit>()),
+      ],
+      child: const AddCardScreen(),
+    ),
     routes: [
       GoRoute(
         path: 'scanner',

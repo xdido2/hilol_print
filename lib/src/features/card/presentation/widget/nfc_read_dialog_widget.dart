@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../common/data/enums/bloc_status_enum.dart';
 import '../../../../common/extensions/extensions.dart';
 import '../../../../core/widget/button/custom_button.dart';
+import '../../domain/entity/nfc_card_entity.dart';
+import '../cubit/card_nfc_cubit.dart';
+import '../cubit/card_nfc_cubit_state.dart';
 
 /// {@template nfc_read_dialog_widget}
 /// Asks the user to hold the card against the phone and reflects the reading
@@ -17,16 +23,19 @@ final class NfcReadDialogWidget extends StatefulWidget {
   final VoidCallback? onRetry;
   final VoidCallback? onClose;
 
-  /// Opens the dialog above [context].
-  static Future<void> show(
-    BuildContext context, {
-    Status status = .loading,
-    String? errorMessage,
-    VoidCallback? onRetry,
-  }) => context.showAppDialog<void>(
-    barrierDismissible: false,
-    builder: (_) => NfcReadDialogWidget(status: status, errorMessage: errorMessage, onRetry: onRetry),
-  );
+  /// Opens the dialog above [context] and drives it from [cubit].
+  ///
+  /// Resolves with the card once a successful read is dismissed, and with
+  /// `null` when the user cancelled or the read failed.
+  ///
+  /// [cubit] is passed explicitly instead of being read from [context]: the
+  /// dialog is pushed onto the root navigator, outside the route subtree that
+  /// provides it.
+  static Future<NfcCardEntity?> show(BuildContext context, {required CardNfcCubit cubit}) =>
+      context.showAppDialog<NfcCardEntity>(
+        barrierDismissible: false,
+        builder: (_) => BlocProvider.value(value: cubit, child: const _NfcReadDialogHost()),
+      );
 
   @override
   State<NfcReadDialogWidget> createState() => _NfcReadDialogWidgetState();
@@ -47,8 +56,15 @@ class _NfcReadDialogWidgetState extends State<NfcReadDialogWidget> with SingleTi
     super.dispose();
   }
 
+  /// A caller that supplies [NfcReadDialogWidget.onClose] owns the closing —
+  /// that is how the host returns the card as the dialog result. Without one
+  /// the dialog still closes itself, so it stays usable on its own.
   void _onClose() {
-    widget.onClose?.call();
+    final onClose = widget.onClose;
+    if (onClose != null) {
+      onClose();
+      return;
+    }
     if (context.canPop) context.pop();
   }
 
@@ -105,6 +121,27 @@ class _NfcReadDialogWidgetState extends State<NfcReadDialogWidget> with SingleTi
       ),
     );
   }
+}
+
+/// Binds [NfcReadDialogWidget] to [CardNfcCubit] and hands the card back as the
+/// dialog result.
+///
+/// Kept private so the dialog itself stays a dumb rendering of a [Status] and
+/// can still be shown without a cubit — in a widget test, for instance.
+final class _NfcReadDialogHost extends StatelessWidget {
+  const _NfcReadDialogHost();
+
+  @override
+  Widget build(BuildContext context) => BlocBuilder<CardNfcCubit, CardNfcCubitState>(
+    builder: (context, state) => NfcReadDialogWidget(
+      status: state.status,
+      errorMessage: state.errorMessage,
+      onRetry: () => unawaited(context.read<CardNfcCubit>().start()),
+      // `card` is null unless the read succeeded, so cancelling resolves the
+      // future with null and the form is left untouched.
+      onClose: () => context.pop<NfcCardEntity>(state.card),
+    ),
+  );
 }
 
 final class _NfcPulse extends StatelessWidget {
