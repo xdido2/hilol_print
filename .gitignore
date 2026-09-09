@@ -48,3 +48,6 @@ app.*.map.json
 .fvm/
 # Stray dir created by a bad shell expansion
 /~/
+
+# Локальный технический разбор фичи card (генерируется, не для репозитория)
+card-feature-explained.html

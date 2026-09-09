@@ -42,6 +42,11 @@ abstract class CardScannerState extends State<CardScannerScreen>
 
   /// The camera handle is revoked while the app is in the background, so it is
   /// released here and reopened on the way back.
+  ///
+  /// `inactive` is deliberately left out: it also covers the camera permission
+  /// dialog, the notification shade and the app switcher preview, where the
+  /// handle stays valid. Tearing the camera down there is what left the preview
+  /// black right after the permission was granted for the first time.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -49,11 +54,12 @@ abstract class CardScannerState extends State<CardScannerScreen>
     switch (state) {
       case .resumed:
         unawaited(_cubit.onAppResumed());
-      case .inactive:
       case .paused:
       case .hidden:
       case .detached:
-        unawaited(_cubit.onAppInactive());
+        unawaited(_cubit.onAppPaused());
+      case .inactive:
+        break;
     }
   }
 
