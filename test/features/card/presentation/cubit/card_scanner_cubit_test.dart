@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -57,6 +59,15 @@ void main() {
 
   void givenPermission(CameraPermissionStatus status) =>
       when(() => repository.requestCameraPermission()).thenAnswer((_) async => status);
+
+  /// Hands the permission answer back only when the returned completer is
+  /// completed, so the lifecycle churn of the system dialog can be replayed
+  /// while the request is still in flight.
+  Completer<CameraPermissionStatus> givenPendingPermission() {
+    final completer = Completer<CameraPermissionStatus>();
+    when(() => repository.requestCameraPermission()).thenAnswer((_) => completer.future);
+    return completer;
+  }
 
   const askingPermission = CardScannerCubitState(status: .loading, action: .permission);
 
@@ -180,11 +191,74 @@ void main() {
       build: buildCubit,
       act: (cubit) async {
         await cubit.start();
-        await cubit.onAppInactive();
+        await cubit.onAppPaused();
       },
       verify: (cubit) {
         expect(cubit.state.isCameraReady, isFalse);
         expect(cubit.cameraController, isNull);
+        verify(() => controller.dispose()).called(1);
+      },
+    );
+
+    blocTest<CardScannerCubit, CardScannerCubitState>(
+      'opens a single camera when the permission dialog churns the lifecycle',
+      build: buildCubit,
+      act: (cubit) async {
+        final Completer<CameraPermissionStatus> permission = givenPendingPermission();
+        final Future<void> started = cubit.start();
+
+        // The dialog takes the focus and hands it straight back on the answer.
+        await cubit.onAppPaused();
+        await cubit.onAppResumed();
+        permission.complete(.granted);
+        await started;
+
+        // Asserted here rather than in `verify`: the cubit is closed by then,
+        // which releases the controller on purpose.
+        expect(cubit.cameraController, same(controller), reason: 'the dialog churn must not orphan the camera');
+        verifyNever(() => controller.dispose());
+      },
+      verify: (cubit) {
+        expect(cubit.state.isCameraReady, isTrue);
+        verify(() => controller.initialize()).called(1);
+        verify(() => controller.startImageStream(any())).called(1);
+      },
+    );
+
+    blocTest<CardScannerCubit, CardScannerCubitState>(
+      'waits for the resume when the grant lands while the app is off screen',
+      build: buildCubit,
+      act: (cubit) async {
+        final Completer<CameraPermissionStatus> permission = givenPendingPermission();
+        final Future<void> started = cubit.start();
+
+        await cubit.onAppPaused();
+        permission.complete(.granted);
+        await started;
+
+        expect(cubit.cameraController, isNull, reason: 'the camera must not open behind a hidden screen');
+
+        await cubit.onAppResumed();
+      },
+      verify: (cubit) {
+        expect(cubit.state.isCameraReady, isTrue);
+        verify(() => controller.initialize()).called(1);
+      },
+    );
+
+    blocTest<CardScannerCubit, CardScannerCubitState>(
+      'drops a controller that failed to initialize',
+      setUp: () {
+        givenPermission(.granted);
+        when(() => controller.initialize()).thenThrow(CameraException('setup', 'Camera is busy'));
+      },
+      build: buildCubit,
+      act: (cubit) => cubit.start(),
+      verify: (cubit) {
+        expect(cubit.state.status.isError, isTrue);
+        expect(cubit.state.action, CardScannerAction.camera);
+        expect(cubit.state.errorMessage, 'Camera is busy');
+        expect(cubit.cameraController, isNull, reason: 'a dead handle would block every reopen');
         verify(() => controller.dispose()).called(1);
       },
     );

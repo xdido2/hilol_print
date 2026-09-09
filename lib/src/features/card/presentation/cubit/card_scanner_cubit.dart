@@ -70,6 +70,23 @@ final class CardScannerCubit extends Cubit<CardScannerCubitState> {
   int _rotationDegrees = 0;
   DateTime _lastFrameAt = .fromMillisecondsSinceEpoch(0);
 
+  /// Enumerating the cameras is a platform round trip; the set cannot change
+  /// while the screen is up, so it is resolved once and reused when the camera
+  /// is reopened after a background.
+  List<CameraDescription>? _cameras;
+
+  /// Camera work runs one at a time. Opening spans several awaits, and a
+  /// lifecycle event landing in the middle of it used to dispose a controller
+  /// that was still initializing — or open a second one on top of it.
+  Future<void> _cameraOperation = Future<void>.value();
+
+  /// True while the system permission dialog is up. The dialog takes the focus
+  /// away, so the lifecycle events it produces describe the dialog rather than
+  /// the app leaving the foreground.
+  bool _isRequestingPermission = false;
+
+  bool _isForeground = true;
+
   /// Live controller for [CameraPreview]; `null` until the camera is ready.
   CameraController? get cameraController => _controller;
 
@@ -78,28 +95,35 @@ final class CardScannerCubit extends Cubit<CardScannerCubitState> {
     if (state.status.isLoading) return;
     emit(state.copyWith(status: .loading, action: .permission, errorMessage: null));
 
+    final CameraPermissionStatus permission;
     try {
-      final CameraPermissionStatus permission = await _requestCameraPermissionUseCase();
-      if (isClosed) return;
-
-      if (!permission.isGranted) {
-        emit(
-          state.copyWith(
-            status: .error,
-            action: .permission,
-            permission: permission,
-            isCameraReady: false,
-            errorMessage: CameraPermissionDeniedException(isPermanent: permission.isPermanentlyDenied).toString(),
-          ),
-        );
-        return;
-      }
-
-      emit(state.copyWith(permission: permission));
-      await _openCamera();
+      permission = await _requestPermission();
     } on Exception catch (e) {
       if (!isClosed) emit(state.copyWith(status: .error, action: .permission, errorMessage: e.toString()));
+      return;
     }
+
+    if (isClosed) return;
+
+    if (!permission.isGranted) {
+      emit(
+        state.copyWith(
+          status: .error,
+          action: .permission,
+          permission: permission,
+          isCameraReady: false,
+          errorMessage: CameraPermissionDeniedException(isPermanent: permission.isPermanentlyDenied).toString(),
+        ),
+      );
+      return;
+    }
+
+    emit(state.copyWith(permission: permission));
+
+    // Answering the dialog can hand the result back before the app is on screen
+    // again; [onAppResumed] picks the camera up as soon as it is.
+    if (!_isForeground) return;
+    await _openCamera();
   }
 
   /// Sends the user to the system settings after a permanent denial.
@@ -119,14 +143,25 @@ final class CardScannerCubit extends Cubit<CardScannerCubitState> {
     }
   }
 
-  /// Releases the camera when the app leaves the foreground: Android revokes
-  /// the handle anyway, so it is reopened from scratch in [onAppResumed].
-  Future<void> onAppInactive() async {
+  /// Releases the camera when the app is backgrounded: the handle is revoked
+  /// there anyway, so it is reopened from scratch in [onAppResumed].
+  ///
+  /// Losing the focus alone (a permission dialog, the notification shade) is
+  /// not a background and must not reach this method — the handle survives it.
+  Future<void> onAppPaused() async {
+    _isForeground = false;
+    if (_isRequestingPermission) return;
+
     await _disposeCamera();
-    if (!isClosed) emit(state.copyWith(action: .camera, isCameraReady: false, isTorchEnabled: false));
+    if (isClosed || (!state.isCameraReady && !state.isTorchEnabled)) return;
+    emit(state.copyWith(action: .camera, isCameraReady: false, isTorchEnabled: false));
   }
 
   Future<void> onAppResumed() async {
+    _isForeground = true;
+    // The permission dialog is still up, or has just closed: [start] owns the
+    // camera until it returns.
+    if (_isRequestingPermission) return;
     if (_controller != null || !(state.permission?.isGranted ?? false) || state.isRecognized) return;
     await _openCamera();
   }
@@ -138,11 +173,36 @@ final class CardScannerCubit extends Cubit<CardScannerCubitState> {
     return super.close();
   }
 
-  Future<void> _openCamera() async {
+  Future<CameraPermissionStatus> _requestPermission() async {
+    _isRequestingPermission = true;
     try {
-      final List<CameraDescription> cameras = await _cameraDescriptionsResolver();
+      return await _requestCameraPermissionUseCase();
+    } finally {
+      _isRequestingPermission = false;
+    }
+  }
+
+  /// Queues camera work behind whatever is already running so that an open and
+  /// a dispose can never interleave.
+  Future<void> _runOnCamera(Future<void> Function() operation) {
+    final Future<void> result = _cameraOperation.then((_) => operation());
+    _cameraOperation = result.then((_) {}, onError: (_, _) {});
+    return result;
+  }
+
+  Future<void> _openCamera() => _runOnCamera(_openCameraExclusive);
+
+  Future<void> _disposeCamera() => _runOnCamera(_disposeCameraExclusive);
+
+  Future<void> _openCameraExclusive() async {
+    // A camera is already up, or the screen is gone: nothing to open.
+    if (isClosed || _controller != null) return;
+
+    try {
+      final List<CameraDescription> cameras = _cameras ?? await _cameraDescriptionsResolver();
       if (isClosed) return;
       if (cameras.isEmpty) throw const CameraUnavailableException();
+      _cameras = cameras;
 
       final CameraDescription description = cameras.firstWhere(
         (camera) => camera.lensDirection == .back,
@@ -154,7 +214,7 @@ final class CardScannerCubit extends Cubit<CardScannerCubitState> {
       await controller.initialize();
 
       if (isClosed) {
-        await _disposeCamera();
+        await _disposeCameraExclusive();
         return;
       }
 
@@ -165,12 +225,20 @@ final class CardScannerCubit extends Cubit<CardScannerCubitState> {
 
       emit(state.copyWith(status: .success, action: .camera, isCameraReady: true, errorMessage: null));
     } on CameraUnavailableException catch (e) {
-      _emitCameraError(e.toString());
+      await _failCamera(e.toString());
     } on CameraException catch (e) {
-      _emitCameraError(e.description ?? e.code);
+      await _failCamera(e.description ?? e.code);
     } on Exception catch (e) {
-      _emitCameraError(e.toString());
+      await _failCamera(e.toString());
     }
+  }
+
+  /// Drops the half-open controller before reporting, so a retry — or the next
+  /// resume — starts from a clean slate instead of a dead handle.
+  Future<void> _failCamera(String message) async {
+    await _disposeCameraExclusive();
+    if (isClosed) return;
+    emit(state.copyWith(status: .error, action: .camera, isCameraReady: false, errorMessage: message));
   }
 
   Future<void> _onFrame(CameraImage image) async {
@@ -214,11 +282,6 @@ final class CardScannerCubit extends Cubit<CardScannerCubitState> {
     );
   }
 
-  void _emitCameraError(String message) {
-    if (isClosed) return;
-    emit(state.copyWith(status: .error, action: .camera, isCameraReady: false, errorMessage: message));
-  }
-
   Future<void> _stopImageStream() async {
     final controller = _controller;
     if (controller == null || !controller.value.isStreamingImages) return;
@@ -230,7 +293,7 @@ final class CardScannerCubit extends Cubit<CardScannerCubitState> {
     }
   }
 
-  Future<void> _disposeCamera() async {
+  Future<void> _disposeCameraExclusive() async {
     final controller = _controller;
     _controller = null;
     if (controller == null) return;
