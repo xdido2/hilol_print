@@ -32,13 +32,15 @@ class _LoginScreenState extends LoginState {
     },
     builder: (context, state) => Scaffold(
       backgroundColor: context.color.scaffoldBackground,
+      // The form scrolls and the action rides above the keyboard, so the
+      // fields stay reachable on short screens.
       body: SafeArea(
-        child: Padding(
-          padding: const .all(16),
+        bottom: false,
+        child: SingleChildScrollView(
+          padding: const .fromLTRB(16, 60, 16, 16),
           child: Column(
             crossAxisAlignment: .start,
             children: [
-              const SizedBox(height: 60),
               Text('Welcome', style: context.textTheme.sfProDisplayW900s32),
               const SizedBox(height: 8),
               Text(
@@ -76,15 +78,18 @@ class _LoginScreenState extends LoginState {
                 contentPadding: const .symmetric(vertical: 14, horizontal: 16),
                 hideErrorMessage: false,
               ),
-              const Spacer(),
-              CustomButton(
-                title: 'Sign in',
-                isDisabled: !isFormValid || state.status.isLoading,
-                isLoading: state.status.isLoading,
-                onTap: onLoginTap,
-              ),
-              const SizedBox(height: 22),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const .fromLTRB(16, 8, 16, 22),
+          child: CustomButton(
+            title: 'Sign in',
+            isDisabled: !isFormValid || state.status.isLoading,
+            isLoading: state.status.isLoading,
+            onTap: onLoginTap,
           ),
         ),
       ),
